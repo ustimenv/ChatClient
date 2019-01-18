@@ -1,22 +1,25 @@
 package com.ustimenko.vlad.client;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
-import android.os.Handler;
-import android.util.Log;
+import android.support.v4.content.LocalBroadcastManager;
 import android.view.View;
 import android.widget.*;
 
-public class Chat extends Activity implements MessageResultReceiver.Receiver
+
+public class Chat extends Activity
 {
 	final String TAG = "qwertf";
 	Button sendButton;
 	EditText messageBox;
 	TextView responseBox;
-	long clientID = -100;
+	long assignedClientID = -100;
+	String chatName;		//who the messages sent from this chat will be addressed to
 	
-	public MessageResultReceiver receiver;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -24,40 +27,37 @@ public class Chat extends Activity implements MessageResultReceiver.Receiver
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.chat_screen);
 		Intent intent = getIntent();
-		clientID = intent.getLongExtra("assignedClientID", -3);		//assigned at the registration stage
-		
+		assignedClientID = intent.getLongExtra("assignedClientID", -3);		//assigned at the registration stage
+		LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver, new IntentFilter("messageReceived"));
+	
+		chatName = intent.getStringExtra("chatName");
 		messageBox = findViewById(R.id.messageBox);
 		sendButton = findViewById(R.id.sendButton);
 		responseBox = findViewById(R.id.responseTextbox);
 		responseBox.setText("Waiting");
-		
-		receiver = new MessageResultReceiver(new Handler());
-		receiver.setReceiver(this);
-		startIntent();
+	
 		
 		sendButton.setOnClickListener(new View.OnClickListener() {
-		@Override
+			@Override
 			public void onClick(View v)
 			{
 				Toast.makeText(getBaseContext(), "Sending"+messageBox.getText().toString(), Toast.LENGTH_LONG).show();
-				new SendMessageAsync().execute("4", String.valueOf(clientID), String.valueOf(clientID), messageBox.getText().toString());
+				new SendMessageAsync().execute("4", String.valueOf(assignedClientID), chatName, messageBox.getText().toString());
 			}
 		});
 	}
 	
+	private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent ) {
+			String data = intent.getStringExtra("message");
+			responseBox.setText(data);
+		}
+	};
 	@Override
-	public void onReceiveResult(int resultCode, Bundle result)
+	protected void onDestroy()
 	{
-		Log.i(TAG, "Received result");
-		Toast.makeText(getBaseContext(),"_" + result.getString("message"),Toast.LENGTH_LONG).show();
-		responseBox.setText(result.getString("message", "defaultValue"));
-		startIntent();
-	}
-
-	private void startIntent()
-	{
-		Intent intent = new Intent(this, ReceiverService.class);
-		intent.putExtra("receiver", receiver);
-		startService(intent);
+		LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
+		super.onDestroy();
 	}
 }

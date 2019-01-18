@@ -18,14 +18,7 @@ public class LoginActivity extends Activity implements MessageResultReceiver.Rec
 	TextView 						loginMessageBox;
 	Button 			 				registerButton;
 	public MessageResultReceiver 	receiver;
-	private long 					assignedClientID;
-	
-	private void initReceiver()
-	{
-		Intent intent = new Intent(this, ReceiverService.class);
-		intent.putExtra("receiver", receiver);
-		startService(intent);
-	}
+	private int						assignedClientID = -1;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -38,17 +31,16 @@ public class LoginActivity extends Activity implements MessageResultReceiver.Rec
 		passwordBox = findViewById(R.id.passwordBox);
 		loginMessageBox = findViewById(R.id.loginMessageBox);
 		registerButton = findViewById(R.id.registerButton);
-		receiver = new MessageResultReceiver(new Handler());
-		receiver.setReceiver(this);
 		
-		initReceiver();
+		assignedClientID = getIntent().getIntExtra("assignedClientID", 0);
 		
 		sendButton.setOnClickListener(new View.OnClickListener()
 		{
 			@Override
 			public void onClick(View v)
 			{
-				Toast.makeText(getBaseContext(), "Sending", Toast.LENGTH_LONG).show();
+				initReceiver();				//start listening for the response
+				Toast.makeText(getBaseContext(), "Logging in...", Toast.LENGTH_LONG).show();
 				new SendMessageAsync().execute("1", usernameBox.getText().toString(), passwordBox.getText().toString(), String.valueOf(assignedClientID));
 			}
 		});
@@ -63,33 +55,39 @@ public class LoginActivity extends Activity implements MessageResultReceiver.Rec
 			}
 		});
 	}
+	
 	@Override
 	public void onReceiveResult(int resultCode, Bundle result)
 	{
 		String message = result.getString("message");
+		Log.d("1", "Message"+message+">>");
+		
 		switch(message.charAt(0))
 		{
-			case '1':											//login successful
-				Log.i("1", "login acknowledged");
-				loginMessageBox.setText(message);
+			case '1':															//login successful
+				loginMessageBox.setText(String.valueOf(assignedClientID));
 				Intent intent = new Intent(LoginActivity.this, ChatList.class);
 				intent.putExtra("assignedClientID", assignedClientID);
 				finish();
 				startActivity(intent);
 				break;
-			case '2':											//login unsuccessful, continue listening in login activity
+			case '2':															//login unsuccessful, continue listening in login activity
 				initReceiver();
 				loginMessageBox.setText("Attempts left:" + message.charAt(2));
 				break;
-			case '3':											//registration message
-				Log.i("1", "register received");
-				StringTokenizer st = new StringTokenizer(message, "#");
-				st.nextToken();
-				assignedClientID = Integer.valueOf(st.nextToken());		//will consequently be used to 'sign' messages from this particular client
-				initReceiver();
+
+			case '4':															//TODO registration unsuccessful
 				break;
 			default:
 				Log.i("1", "Unrecognisable flag " + message.charAt(0));
 		}
+	}
+	private void initReceiver()
+	{
+		receiver = new MessageResultReceiver(new Handler());
+		receiver.setReceiver(this);
+		Intent intent = new Intent(this, ReceiverService.class);
+		intent.putExtra("receiver", receiver);
+		startService(intent);
 	}
 }
