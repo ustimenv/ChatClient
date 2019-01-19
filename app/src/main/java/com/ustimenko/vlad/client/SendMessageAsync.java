@@ -24,7 +24,8 @@ public class SendMessageAsync extends AsyncTask<String, Void, Void>
 				message.append("#");
 			}
 			final int SERVER_PORT = 50000;
-			final String SERVER_IP = "192.168.1.137";
+//			final String SERVER_IP = "169.254.9.190";
+			final String SERVER_IP = "192.168.42.91";
 			socket = new Socket(InetAddress.getByName(SERVER_IP), SERVER_PORT);
 			writer = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())));
 			Log.i("1", "Sends from " + socket.getLocalPort() + " to " + socket.getPort());
