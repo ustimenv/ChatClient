@@ -67,6 +67,7 @@ public class LoginActivity extends Activity implements MessageResultReceiver.Rec
 			case '1':															//login successful
 				loginMessageBox.setText(String.valueOf(assignedClientID));
 				Intent intent = new Intent(LoginActivity.this, ChatList.class);
+				Log.i("1", "In login ID:"+String.valueOf(assignedClientID));
 				intent.putExtra("assignedClientID", assignedClientID);
 				finish();
 				startActivity(intent);
@@ -75,7 +76,6 @@ public class LoginActivity extends Activity implements MessageResultReceiver.Rec
 				initReceiver();
 				loginMessageBox.setText("Attempts left:" + message.charAt(2));
 				break;
-
 			case '4':															//TODO registration unsuccessful
 				break;
 			default:

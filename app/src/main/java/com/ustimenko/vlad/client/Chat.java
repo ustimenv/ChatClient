@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.view.View;
 import android.widget.*;
+import org.w3c.dom.Text;
 
 
 public class Chat extends Activity
@@ -19,7 +20,7 @@ public class Chat extends Activity
 	TextView responseBox;
 	long assignedClientID = -100;
 	String chatName;		//who the messages sent from this chat will be addressed to
-	
+	LinearLayout linearLayout;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -31,6 +32,7 @@ public class Chat extends Activity
 		LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver, new IntentFilter("messageReceived"));
 	
 		chatName = intent.getStringExtra("chatName");
+		linearLayout = findViewById(R.id.chatScreen);
 		messageBox = findViewById(R.id.messageBox);
 		sendButton = findViewById(R.id.sendButton);
 		responseBox = findViewById(R.id.responseTextbox);
@@ -51,9 +53,19 @@ public class Chat extends Activity
 		@Override
 		public void onReceive(Context context, Intent intent ) {
 			String data = intent.getStringExtra("message");
-			responseBox.setText(data);
+			addNewMsg(data);
 		}
 	};
+	private void addNewMsg(String msgText)
+	{
+		TextView newMsg= new TextView(this);
+		newMsg.setLayoutParams(new LinearLayout.LayoutParams(
+				LinearLayout.LayoutParams.WRAP_CONTENT,
+				LinearLayout.LayoutParams.WRAP_CONTENT));
+		
+		newMsg.setText(msgText);
+		linearLayout.addView(newMsg);
+	}
 	@Override
 	protected void onDestroy()
 	{

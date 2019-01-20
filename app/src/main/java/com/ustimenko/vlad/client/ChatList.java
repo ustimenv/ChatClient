@@ -22,7 +22,7 @@ public class ChatList extends Activity implements MessageResultReceiver.Receiver
 	EditText chatName;
 	String chatNameStr;
 	HashMap <String, ArrayList<Message>> inbox = new HashMap<String, ArrayList<Message>>();
-	long assignedClientID;
+	int assignedClientID;
 	public MessageResultReceiver receiver;
 	
 	@Override
@@ -40,15 +40,15 @@ public class ChatList extends Activity implements MessageResultReceiver.Receiver
 		startIntent();
 		
 		Intent initiatingIntent = getIntent();
-		assignedClientID = initiatingIntent.getLongExtra("assignedClientID", -1);
-		Toast.makeText(getBaseContext(),"KKK" + assignedClientID,Toast.LENGTH_LONG).show();
+		assignedClientID = initiatingIntent.getIntExtra("assignedClientID", -2);
+		Toast.makeText(getBaseContext(),"ID:" + assignedClientID,Toast.LENGTH_LONG).show();
 		
 		
 		addNewConvo.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v)
 			{
-				Toast.makeText(getBaseContext(),"KKK",Toast.LENGTH_LONG).show();
+				Toast.makeText(getBaseContext(),"Adding chat",Toast.LENGTH_LONG).show();
 				chatNameStr = chatName.getText().toString();
 				addConvoView();
 			}

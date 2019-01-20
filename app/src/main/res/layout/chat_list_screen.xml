@@ -12,7 +12,7 @@
             android:layout_marginTop="100dp"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="Name:" >
+            android:hint="New chat name:" >
     </EditText>
 
     <Button
