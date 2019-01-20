@@ -2,6 +2,7 @@ package com.ustimenko.vlad.client;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -19,6 +20,7 @@ public class LoginActivity extends Activity implements MessageResultReceiver.Rec
 	Button 			 				registerButton;
 	public MessageResultReceiver 	receiver;
 	private int						assignedClientID = -1;
+	SharedPreferences prefs;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -32,7 +34,8 @@ public class LoginActivity extends Activity implements MessageResultReceiver.Rec
 		loginMessageBox = findViewById(R.id.loginMessageBox);
 		registerButton = findViewById(R.id.registerButton);
 		
-		assignedClientID = getIntent().getIntExtra("assignedClientID", 0);
+		prefs = getApplicationContext().getSharedPreferences("ChatPreferences", MODE_PRIVATE);
+		
 		
 		sendButton.setOnClickListener(new View.OnClickListener()
 		{
@@ -41,6 +44,10 @@ public class LoginActivity extends Activity implements MessageResultReceiver.Rec
 			{
 				initReceiver();				//start listening for the response
 				Toast.makeText(getBaseContext(), "Logging in...", Toast.LENGTH_LONG).show();
+				SharedPreferences.Editor editor = prefs.edit();		//remember some of the login details to simplify the procedure for next launch
+				editor.putInt("ID", assignedClientID);
+				editor.apply();
+				
 				new SendMessageAsync().execute("1", usernameBox.getText().toString(), passwordBox.getText().toString(), String.valueOf(assignedClientID));
 			}
 		});
@@ -55,7 +62,14 @@ public class LoginActivity extends Activity implements MessageResultReceiver.Rec
 			}
 		});
 	}
-	
+	@Override
+	protected void onStart()
+	{
+		super.onStart();
+		
+		assignedClientID = prefs.getInt("ID", -1);						//retrieve previous session's login details
+		assignedClientID = getIntent().getIntExtra("assignedClientID", assignedClientID);		//if the client had previosouly registered as a new user, overwrite the shared preferences field
+	}
 	@Override
 	public void onReceiveResult(int resultCode, Bundle result)
 	{

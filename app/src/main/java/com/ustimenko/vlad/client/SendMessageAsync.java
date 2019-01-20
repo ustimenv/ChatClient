@@ -12,33 +12,20 @@ public class SendMessageAsync extends AsyncTask<String, Void, Void>
 	@Override
 	protected Void doInBackground(String... args)
 	{
-		Socket socket = null;
-		PrintWriter writer = null;
-		
-		try
+		final String SERVER_IP = "192.168.0.192";
+		final int SERVER_PORT = 50000;
+		try(Socket socket = new Socket(InetAddress.getByName(SERVER_IP), SERVER_PORT);
+			PrintWriter writer = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()))))
 		{
 			StringBuilder message = new StringBuilder();
 			for(String s : args)
 			{
-				message.append(s);
-				message.append("#");
+				message.append(s).append('#');
 			}
-			final int SERVER_PORT = 50000;
-			final String SERVER_IP = "192.168.43.16";
-			socket = new Socket(InetAddress.getByName(SERVER_IP), SERVER_PORT);
-			writer = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())));
 			Log.i("1", "Sends from " + socket.getLocalPort() + " to " + socket.getPort());
 			writer.write(message.toString());
 			writer.flush();
 		}catch(Exception e){Log.e("In async", e.getMessage());}
-		finally
-		{
-			try
-			{
-				socket.close();
-				writer.close();
-			}catch(Exception e){Log.e("Error closing socket", e.getMessage());}
-		}
 		return null;
 	}
 }
