@@ -2,10 +2,8 @@ package com.ustimenko.vlad.client;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.media.MediaDataSource;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
@@ -17,11 +15,11 @@ import java.util.HashMap;
 public class ChatList extends Activity implements MessageResultReceiver.Receiver
 {
 	Button addNewConvo;
-	LinearLayout l;
-	FragmentManager fragmentManager;
+	LinearLayout linearLayout;
 	EditText chatName;
 	String chatNameStr;
-	HashMap <String, ArrayList<Message>> inbox = new HashMap<String, ArrayList<Message>>();
+	HashMap <String, ArrayList<Message>> inbox = new HashMap<String, ArrayList<Message>>();	//
+	
 	int assignedClientID;
 	public MessageResultReceiver receiver;
 	
@@ -31,7 +29,7 @@ public class ChatList extends Activity implements MessageResultReceiver.Receiver
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.chat_list_screen);
 		
-		l = findViewById(R.id.chat_list_screen);
+		linearLayout = findViewById(R.id.chat_list_screen);
 		addNewConvo = findViewById(R.id.addConversation);
 		chatName = findViewById(R.id.newConversationName);
 		
@@ -41,7 +39,7 @@ public class ChatList extends Activity implements MessageResultReceiver.Receiver
 		
 		Intent initiatingIntent = getIntent();
 		assignedClientID = initiatingIntent.getIntExtra("assignedClientID", -2);
-		Toast.makeText(getBaseContext(),"ID:" + assignedClientID,Toast.LENGTH_LONG).show();
+		Toast.makeText(getBaseContext(),"ID:" + assignedClientID, Toast.LENGTH_LONG).show();
 		
 		
 		addNewConvo.setOnClickListener(new View.OnClickListener() {
@@ -55,14 +53,14 @@ public class ChatList extends Activity implements MessageResultReceiver.Receiver
 		});
 	}
 	
-	private void addConvoView()
+	private void addConvoView()					//a button corresponds to each conversation the client is part of
 	{
 		Button newChat = new Button(this);
 		newChat.setLayoutParams(new LinearLayout.LayoutParams(
 				LinearLayout.LayoutParams.MATCH_PARENT,
 				LinearLayout.LayoutParams.MATCH_PARENT));
 		
-		newChat.setText(chatNameStr);
+		newChat.setText(chatNameStr + assignedClientID);
 		
 		
 		newChat.setOnClickListener(new View.OnClickListener()
@@ -76,7 +74,7 @@ public class ChatList extends Activity implements MessageResultReceiver.Receiver
 				startActivity(intent);
 			}
 		});
-		l.addView(newChat);
+		linearLayout.addView(newChat);
 	}
 	
 	@Override

@@ -42,7 +42,7 @@ public class LoginActivity extends Activity implements MessageResultReceiver.Rec
 			@Override
 			public void onClick(View v)
 			{
-				initReceiver();				//start listening for the response
+				initReceiver();										//start listening for the response
 				Toast.makeText(getBaseContext(), "Logging in...", Toast.LENGTH_LONG).show();
 				SharedPreferences.Editor editor = prefs.edit();		//remember some of the login details to simplify the procedure for next launch
 				editor.putInt("ID", assignedClientID);

@@ -40,8 +40,8 @@ public class RegisterActivity extends Activity implements MessageResultReceiver.
 				initReceiver();
 				Toast.makeText(getBaseContext(), "Registering...", Toast.LENGTH_LONG).show();
 				new SendMessageAsync().execute("2", usernameBox.getText().toString(), passwordBox.getText().toString());
-				Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
-				startActivity(intent);
+//				Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
+//				startActivity(intent);
 			}
 		});
 	}
@@ -50,21 +50,24 @@ public class RegisterActivity extends Activity implements MessageResultReceiver.
 	public void onReceiveResult(int resultCode, Bundle result)
 	{
 		String message = result.getString("message");
-		//TODO registration denied,should the name be taken
-//		switch(message.charAt(0))
-//		{
-//			case '3'://registration successful
-//		}
 		StringTokenizer st = new StringTokenizer(message, "#");
-		st.nextToken();
-		
-		int assignedClientID = Integer.valueOf(st.nextToken());
-		
-		Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
-		intent.putExtra("assignedClientID", assignedClientID);
-		finish();
-		startActivity(intent);
-		Log.d("1", "Message"+message+">>");
+		char flag = st.nextToken().charAt(0);
+		switch(flag)
+		{
+			case '3':															//registration successful
+				int assignedClientID = Integer.valueOf(st.nextToken());			//extract the ID that will be used to 'sign' messages by the client
+				Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);	//now the client has to log in, be it with the newly registered credentials or old
+				intent.putExtra("assignedClientID", assignedClientID);
+				finish();
+				startActivity(intent);
+				break;
+			case '4':															//registration denied
+				String takenUsername = st.nextToken();
+				registrationFeedback.setText("Name" + takenUsername + " is already used");
+				initReceiver();
+				break;
+				
+		}
 	}
 	private void initReceiver()
 	{

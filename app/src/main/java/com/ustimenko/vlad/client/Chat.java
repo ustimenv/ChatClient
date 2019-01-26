@@ -28,7 +28,7 @@ public class Chat extends Activity
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.chat_screen);
 		Intent intent = getIntent();
-		assignedClientID = intent.getLongExtra("assignedClientID", -3);		//assigned at the registration stage
+		assignedClientID = intent.getIntExtra("assignedClientID", -3);		//assigned at the registration stage
 		LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver, new IntentFilter("messageReceived"));
 	
 		chatName = intent.getStringExtra("chatName");
@@ -44,7 +44,7 @@ public class Chat extends Activity
 			public void onClick(View v)
 			{
 				Toast.makeText(getBaseContext(), "Sending"+messageBox.getText().toString(), Toast.LENGTH_LONG).show();
-				new SendMessageAsync().execute("4", String.valueOf(assignedClientID), chatName, messageBox.getText().toString());
+				new SendMessageAsync().execute("5", String.valueOf(assignedClientID), chatName, messageBox.getText().toString());
 			}
 		});
 	}
