@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.view.View;
 import android.widget.*;
-import org.w3c.dom.Text;
 
 
 public class Chat extends Activity
@@ -34,7 +33,7 @@ public class Chat extends Activity
 		chatName = intent.getStringExtra("chatName");
 		linearLayout = findViewById(R.id.chatScreen);
 		messageBox = findViewById(R.id.messageBox);
-		sendButton = findViewById(R.id.sendButton);
+		sendButton = findViewById(R.id.register_send_button);
 		responseBox = findViewById(R.id.responseTextbox);
 		responseBox.setText("Waiting");
 	

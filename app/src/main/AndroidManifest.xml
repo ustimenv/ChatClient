@@ -28,7 +28,7 @@
         </activity>
 
         <activity
-                android:name=".ChatList"
+                android:name=".Home"
                 android:label="ChatList"
                 android:theme="@style/AppTheme.NoActionBar">
         </activity>
@@ -36,7 +36,7 @@
         <activity
                 android:name=".Chat"
                 android:label="Chat"
-                android:parentActivityName=".ChatList"
+                android:parentActivityName=".Home"
                 android:theme="@style/AppTheme.NoActionBar">
         </activity>
 

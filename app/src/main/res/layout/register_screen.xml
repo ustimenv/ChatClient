@@ -4,18 +4,18 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:orientation="vertical"
-        android:id="@+id/registerScreen">
+        android:id="@+id/register_layout_prime">
 
     <EditText
-            android:id="@+id/usernameBox"
+            android:id="@+id/register_username_input_box"
             android:layout_marginTop="100dp"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="Your username" >
+            android:hint="Your username" >
     </EditText>
 
     <EditText
-            android:id="@+id/passwordBox"
+            android:id="@+id/register_password_input_box"
             android:inputType="textPassword"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
@@ -23,14 +23,14 @@
     </EditText>
 
     <Button
-            android:id="@+id/sendButton"
+            android:id="@+id/register_send_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Submit" >
     </Button>
 
     <TextView
-            android:id="@+id/registrationFeedback"
+            android:id="@+id/register_registration_feedback"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="No feedback" >

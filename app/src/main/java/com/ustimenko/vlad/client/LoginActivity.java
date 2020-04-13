@@ -9,8 +9,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.*;
 
-import java.util.StringTokenizer;
-
 public class LoginActivity extends Activity implements MessageResultReceiver.Receiver
 {
 	Button 	 						sendButton;
@@ -18,7 +16,7 @@ public class LoginActivity extends Activity implements MessageResultReceiver.Rec
 	EditText 						passwordBox;
 	TextView 						loginMessageBox;
 	Button 			 				registerButton;
-	public MessageResultReceiver 	receiver;
+	MessageResultReceiver 			receiver;
 	private int						assignedClientID = -1;
 	SharedPreferences prefs;
 	
@@ -28,11 +26,11 @@ public class LoginActivity extends Activity implements MessageResultReceiver.Rec
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.login_screen);
 		
-		sendButton = findViewById(R.id.sendButton);
-		usernameBox = findViewById(R.id.usernameBox);
-		passwordBox = findViewById(R.id.passwordBox);
-		loginMessageBox = findViewById(R.id.loginMessageBox);
-		registerButton = findViewById(R.id.registerButton);
+		sendButton = findViewById(R.id.login_send_button);
+		usernameBox = findViewById(R.id.login_username_input_box);
+		passwordBox = findViewById(R.id.login_password_input_box);
+		loginMessageBox = findViewById(R.id.login_login_feedback);
+		registerButton = findViewById(R.id.login_register_button);
 		
 		prefs = getApplicationContext().getSharedPreferences("ChatPreferences", MODE_PRIVATE);
 		
@@ -44,9 +42,9 @@ public class LoginActivity extends Activity implements MessageResultReceiver.Rec
 			{
 				initReceiver();										//start listening for the response
 				Toast.makeText(getBaseContext(), "Logging in...", Toast.LENGTH_LONG).show();
-				SharedPreferences.Editor editor = prefs.edit();		//remember some of the login details to simplify the procedure for next launch
-				editor.putInt("ID", assignedClientID);
-				editor.apply();
+//				SharedPreferences.Editor editor = prefs.edit();		//remember some of the login details to simplify the procedure for next launch
+//				editor.putInt("ID", assignedClientID);
+//				editor.apply();
 				
 				new SendMessageAsync().execute("1", usernameBox.getText().toString(), passwordBox.getText().toString(), String.valueOf(assignedClientID));
 			}
@@ -80,15 +78,15 @@ public class LoginActivity extends Activity implements MessageResultReceiver.Rec
 		{
 			case '1':															//login successful
 				loginMessageBox.setText(String.valueOf(assignedClientID));
-				Intent intent = new Intent(LoginActivity.this, ChatList.class);
-				Log.i("1", "In login ID:"+String.valueOf(assignedClientID));
+				Intent intent = new Intent(LoginActivity.this, Home.class);
 				intent.putExtra("assignedClientID", assignedClientID);
 				finish();
 				startActivity(intent);
 				break;
-			case '2':															//login unsuccessful, continue listening in login activity
+
+			case '2':	//LOGIN_NAK
 				initReceiver();
-				loginMessageBox.setText("Attempts left:" + message.charAt(2));
+//				loginMessageBox.setText("Attempts left:" + message.charAt(2));
 				break;
 			case '4':															//TODO registration unsuccessful
 				break;
