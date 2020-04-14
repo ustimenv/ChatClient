@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
+import android.security.keystore.KeyGenParameterSpec;
+import android.security.keystore.KeyProperties;
 import android.util.Log;
 import android.view.View;
 import android.widget.*;
@@ -12,8 +14,7 @@ import android.widget.*;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManagerFactory;
-import java.security.KeyStore;
-import java.security.SecureRandom;
+import java.security.*;
 
 public class LoginActivity extends BaseActivity
 {
@@ -29,7 +30,7 @@ public class LoginActivity extends BaseActivity
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.login_screen);
-		
+		generateAndStoreKeypair();
 		sendButton = findViewById(R.id.login_send_button);
 		usernameBox = findViewById(R.id.login_username_input_box);
 		passwordBox = findViewById(R.id.login_password_input_box);
@@ -92,6 +93,30 @@ public class LoginActivity extends BaseActivity
 				break;
 			default:
 				Log.i("1", "Unrecognisable flag " + message.charAt(0));
+		}
+	}
+	
+	private void generateAndStoreKeypair()
+	{
+		final String myKeyAlias = "mykey2";
+		try
+		{
+			KeyPairGenerator kpg = KeyPairGenerator.getInstance(
+					KeyProperties.KEY_ALGORITHM_RSA, "AndroidKeyStore");
+			
+			kpg.initialize(new KeyGenParameterSpec.Builder(
+					myKeyAlias,
+					KeyProperties.PURPOSE_DECRYPT | KeyProperties.PURPOSE_ENCRYPT)
+//					.setDigests(KeyProperties.DIGEST_SHA256, KeyProperties.DIGEST_SHA512)
+					.setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_RSA_PKCS1)
+					.setKeySize(2048)
+					.build());
+			
+			KeyPair keyPair = kpg.generateKeyPair();
+			
+		} catch (NoSuchAlgorithmException | InvalidAlgorithmParameterException | NoSuchProviderException e)
+		{
+			e.printStackTrace();
 		}
 	}
 }

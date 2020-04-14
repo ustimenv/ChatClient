@@ -4,12 +4,13 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.security.keystore.KeyProperties;
+import android.util.Base64;
 import android.view.View;
 import android.widget.*;
 
 import javax.net.ssl.*;
-import java.security.KeyStore;
-import java.security.SecureRandom;
+import java.security.*;
 import java.util.StringTokenizer;
 
 public class RegisterActivity extends BaseActivity
@@ -65,8 +66,6 @@ public class RegisterActivity extends BaseActivity
 
 		}
 	}
-	
-	
 	
 }
 

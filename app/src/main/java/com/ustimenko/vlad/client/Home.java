@@ -50,7 +50,7 @@ public class Home extends BaseActivity
 			public void onClick(View v)
 			{
 				Toast.makeText(getBaseContext(),"Postin' the tweet!",Toast.LENGTH_LONG).show();
-				new SendMessageAsync(Home.super.sslContext).execute("3", tweetInput.getText().toString());
+				new SendMessageAsync(Home.super.sslContext, true).execute("3", tweetInput.getText().toString());
 			}
 		});
 	}
@@ -59,11 +59,11 @@ public class Home extends BaseActivity
 	public void onReceiveResult(int resultCode, Bundle result)
 	{
 		String message = result.getString("message");
-		StringTokenizer st = new StringTokenizer(message, "#");
-		char flag = st.nextToken().charAt(0);
+//		StringTokenizer st = new StringTokenizer(message, "#");
+//		char flag = st.nextToken().charAt(0);
 		
-		Toast.makeText(getBaseContext(),"Gotcha! " + flag, Toast.LENGTH_LONG).show();
-		addTweetToScreen(st.nextToken());
+		Toast.makeText(getBaseContext(),"Gotcha! " , Toast.LENGTH_LONG).show();
+		addTweetToScreen(message);
 		super.initReceiver();
 	}
 	
@@ -80,7 +80,17 @@ public class Home extends BaseActivity
 		t.setText(content);
 		tweetsLayout.addView(t);
 	}
-	
+	@Override
+	void initReceiver()
+	{
+		receiver = new MessageResultReceiver(new Handler());
+		receiver.setReceiver(this);
+		Intent intent = new Intent(this, ReceiverService.class);
+		intent.putExtra("receiver", receiver);
+		intent.putExtra("decodingRequired", true);
+		startService(intent);
+	}
+
 
 //	@Override
 //	public void onReceiveResult(int resultCode, Bundle result)
