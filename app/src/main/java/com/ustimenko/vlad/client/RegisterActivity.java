@@ -7,6 +7,9 @@ import android.os.Handler;
 import android.view.View;
 import android.widget.*;
 
+import javax.net.ssl.*;
+import java.security.KeyStore;
+import java.security.SecureRandom;
 import java.util.StringTokenizer;
 
 public class RegisterActivity extends Activity implements MessageResultReceiver.Receiver
@@ -37,7 +40,7 @@ public class RegisterActivity extends Activity implements MessageResultReceiver.
 			{
 				initReceiver();
 				Toast.makeText(getBaseContext(), "Registering...", Toast.LENGTH_LONG).show();
-				new SendMessageAsync().execute("2", usernameBox.getText().toString(), passwordBox.getText().toString());
+				new SendMessageAsync(setupSSL()).execute("2", usernameBox.getText().toString(), passwordBox.getText().toString());
 			}
 		});
 	}
@@ -62,6 +65,24 @@ public class RegisterActivity extends Activity implements MessageResultReceiver.
 				initReceiver();
 				break;
 
+		}
+	}
+	private SSLContext setupSSL()
+	{
+		try {
+			char[] password= "123456".toCharArray();
+			KeyStore ksTrust = KeyStore.getInstance("BKS");
+			ksTrust.load(getApplicationContext().getResources().openRawResource(R.raw.cert_1), password);
+			TrustManagerFactory tmf = TrustManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+			tmf.init(ksTrust);
+
+			SSLContext sslContext = SSLContext.getInstance("TLSv1.2");
+			sslContext.init(null, tmf.getTrustManagers(), new SecureRandom());
+			return sslContext;
+		} catch (Exception e)
+		{
+			e.printStackTrace();
+			return null;
 		}
 	}
 	

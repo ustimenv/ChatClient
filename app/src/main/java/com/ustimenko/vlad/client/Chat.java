@@ -10,15 +10,20 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.view.View;
 import android.widget.*;
 
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManagerFactory;
+import java.security.KeyStore;
+import java.security.SecureRandom;
 
-public class Chat extends Activity
-{
+
+public class Chat extends Activity {
 	final String TAG = "qwertf";
 	Button sendButton;
 	EditText messageBox;
 	TextView responseBox;
 	long assignedClientID = -100;
-	String chatName;		//who the messages sent from this chat will be addressed to
+	String chatName;        //who the messages sent from this chat will be addressed to
 	LinearLayout linearLayout;
 	
 	@Override
@@ -27,37 +32,38 @@ public class Chat extends Activity
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.chat_screen);
 		Intent intent = getIntent();
-		assignedClientID = intent.getIntExtra("assignedClientID", -3);		//assigned at the registration stage
+		assignedClientID = intent.getIntExtra("assignedClientID", -3);        //assigned at the registration stage
 		LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver, new IntentFilter("messageReceived"));
-	
+		
 		chatName = intent.getStringExtra("chatName");
 		linearLayout = findViewById(R.id.chatScreen);
 		messageBox = findViewById(R.id.messageBox);
 		sendButton = findViewById(R.id.register_send_button);
 		responseBox = findViewById(R.id.responseTextbox);
 		responseBox.setText("Waiting");
-	
+		
 		
 		sendButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v)
 			{
-				Toast.makeText(getBaseContext(), "Sending"+messageBox.getText().toString(), Toast.LENGTH_LONG).show();
-				new SendMessageAsync().execute("5", String.valueOf(assignedClientID), chatName, messageBox.getText().toString());
+				Toast.makeText(getBaseContext(), "Sending" + messageBox.getText().toString(), Toast.LENGTH_LONG).show();
+				new SendMessageAsync(setupSSL()).execute("5", String.valueOf(assignedClientID), chatName, messageBox.getText().toString());
 			}
 		});
 	}
 	
 	private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
 		@Override
-		public void onReceive(Context context, Intent intent ) {
+		public void onReceive(Context context, Intent intent) {
 			String data = intent.getStringExtra("message");
 			addNewMsg(data);
 		}
 	};
+	
 	private void addNewMsg(String msgText)
 	{
-		TextView newMsg= new TextView(this);
+		TextView newMsg = new TextView(this);
 		newMsg.setLayoutParams(new LinearLayout.LayoutParams(
 				LinearLayout.LayoutParams.WRAP_CONTENT,
 				LinearLayout.LayoutParams.WRAP_CONTENT));
@@ -65,10 +71,30 @@ public class Chat extends Activity
 		newMsg.setText(msgText);
 		linearLayout.addView(newMsg);
 	}
+	
 	@Override
 	protected void onDestroy()
 	{
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
 		super.onDestroy();
+	}
+	
+	private SSLContext setupSSL()
+	{
+		try {
+			char[] password = "123456".toCharArray();
+			KeyStore ksTrust = KeyStore.getInstance("BKS");
+			ksTrust.load(getApplicationContext().getResources().openRawResource(R.raw.cert_1), password);
+			TrustManagerFactory tmf = TrustManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+			tmf.init(ksTrust);
+			
+			SSLContext sslContext = SSLContext.getInstance("TLSv1.2");
+			sslContext.init(null, tmf.getTrustManagers(), new SecureRandom());
+			return sslContext;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+		
 	}
 }
