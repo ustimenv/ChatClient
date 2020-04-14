@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.StringTokenizer;
 
-public class Home extends Activity implements MessageResultReceiver.Receiver
+public class Home extends BaseActivity
 {
 	private Button postButton;
 	private ConstraintLayout layout;
@@ -50,7 +50,7 @@ public class Home extends Activity implements MessageResultReceiver.Receiver
 			public void onClick(View v)
 			{
 				Toast.makeText(getBaseContext(),"Postin' the tweet!",Toast.LENGTH_LONG).show();
-				new SendMessageAsync(setupSSL()).execute("3", tweetInput.getText().toString());
+				new SendMessageAsync(Home.super.sslContext).execute("3", tweetInput.getText().toString());
 			}
 		});
 	}
@@ -64,17 +64,9 @@ public class Home extends Activity implements MessageResultReceiver.Receiver
 		
 		Toast.makeText(getBaseContext(),"Gotcha! " + flag, Toast.LENGTH_LONG).show();
 		addTweetToScreen(st.nextToken());
-		initReceiver();
+		super.initReceiver();
 	}
 	
-	private void initReceiver()
-	{
-		receiver = new MessageResultReceiver(new Handler());
-		receiver.setReceiver(this);
-		Intent intent = new Intent(this, ReceiverService.class);
-		intent.putExtra("receiver", receiver);
-		startService(intent);
-	}
 
 	private void addTweetToScreen(String content)
 	{
@@ -88,24 +80,7 @@ public class Home extends Activity implements MessageResultReceiver.Receiver
 		t.setText(content);
 		tweetsLayout.addView(t);
 	}
-	private SSLContext setupSSL()
-	{
-		try {
-			char[] password= "123456".toCharArray();
-			KeyStore ksTrust = KeyStore.getInstance("BKS");
-			ksTrust.load(getApplicationContext().getResources().openRawResource(R.raw.cert_1), password);
-			TrustManagerFactory tmf = TrustManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-			tmf.init(ksTrust);
-			
-			SSLContext sslContext = SSLContext.getInstance("TLSv1.2");
-			sslContext.init(null, tmf.getTrustManagers(), new SecureRandom());
-			return sslContext;
-		} catch (Exception e)
-		{
-			e.printStackTrace();
-			return null;
-		}
-	}
+	
 
 //	@Override
 //	public void onReceiveResult(int resultCode, Bundle result)

@@ -19,6 +19,10 @@ public class ReceiverService extends IntentService
 	@Override
 	protected void onHandleIntent(Intent intent)
 	{
+		System.setProperty("javax.net.debug", "ssl");
+		
+		
+
 		Socket s = null;
 		String message = "$";
 		ServerSocket serverSocket = null;

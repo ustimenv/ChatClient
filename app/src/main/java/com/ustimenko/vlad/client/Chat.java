@@ -17,7 +17,7 @@ import java.security.KeyStore;
 import java.security.SecureRandom;
 
 
-public class Chat extends Activity {
+public class Chat extends BaseActivity {
 	final String TAG = "qwertf";
 	Button sendButton;
 	EditText messageBox;
@@ -48,7 +48,8 @@ public class Chat extends Activity {
 			public void onClick(View v)
 			{
 				Toast.makeText(getBaseContext(), "Sending" + messageBox.getText().toString(), Toast.LENGTH_LONG).show();
-				new SendMessageAsync(setupSSL()).execute("5", String.valueOf(assignedClientID), chatName, messageBox.getText().toString());
+				new SendMessageAsync(Chat.super.sslContext)
+						.execute("5", String.valueOf(assignedClientID), chatName, messageBox.getText().toString());
 			}
 		});
 	}
@@ -79,22 +80,10 @@ public class Chat extends Activity {
 		super.onDestroy();
 	}
 	
-	private SSLContext setupSSL()
+	@Override
+	public void onReceiveResult(int resultCode, Bundle result)
 	{
-		try {
-			char[] password = "123456".toCharArray();
-			KeyStore ksTrust = KeyStore.getInstance("BKS");
-			ksTrust.load(getApplicationContext().getResources().openRawResource(R.raw.cert_1), password);
-			TrustManagerFactory tmf = TrustManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-			tmf.init(ksTrust);
-			
-			SSLContext sslContext = SSLContext.getInstance("TLSv1.2");
-			sslContext.init(null, tmf.getTrustManagers(), new SecureRandom());
-			return sslContext;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return null;
-		}
-		
+		Toast.makeText(getBaseContext(),"_" + result.getString("message"),Toast.LENGTH_LONG).show();
 	}
+	
 }

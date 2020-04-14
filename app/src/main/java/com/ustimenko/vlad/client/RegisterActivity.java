@@ -12,15 +12,12 @@ import java.security.KeyStore;
 import java.security.SecureRandom;
 import java.util.StringTokenizer;
 
-public class RegisterActivity extends Activity implements MessageResultReceiver.Receiver
+public class RegisterActivity extends BaseActivity
 {
 	Button 	 sendButton;
 	EditText usernameBox;
 	EditText passwordBox;
 	TextView registrationFeedback;
-	
-	MessageResultReceiver 	receiver;
-	
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -40,7 +37,8 @@ public class RegisterActivity extends Activity implements MessageResultReceiver.
 			{
 				initReceiver();
 				Toast.makeText(getBaseContext(), "Registering...", Toast.LENGTH_LONG).show();
-				new SendMessageAsync(setupSSL()).execute("2", usernameBox.getText().toString(), passwordBox.getText().toString());
+				new SendMessageAsync(RegisterActivity.super.sslContext)
+						.execute("2", usernameBox.getText().toString(), passwordBox.getText().toString());
 			}
 		});
 	}
@@ -62,38 +60,13 @@ public class RegisterActivity extends Activity implements MessageResultReceiver.
 				break;
 			case '4':						//REGISTRATION_NAK
 				registrationFeedback.setText("Username taken, try another!");
-				initReceiver();
+				super.initReceiver();
 				break;
 
 		}
 	}
-	private SSLContext setupSSL()
-	{
-		try {
-			char[] password= "123456".toCharArray();
-			KeyStore ksTrust = KeyStore.getInstance("BKS");
-			ksTrust.load(getApplicationContext().getResources().openRawResource(R.raw.cert_1), password);
-			TrustManagerFactory tmf = TrustManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-			tmf.init(ksTrust);
-
-			SSLContext sslContext = SSLContext.getInstance("TLSv1.2");
-			sslContext.init(null, tmf.getTrustManagers(), new SecureRandom());
-			return sslContext;
-		} catch (Exception e)
-		{
-			e.printStackTrace();
-			return null;
-		}
-	}
 	
-	private void initReceiver()
-	{
-		receiver = new MessageResultReceiver(new Handler());
-		receiver.setReceiver(this);
-		Intent intent = new Intent(this, ReceiverService.class);
-		intent.putExtra("receiver", receiver);
-		startService(intent);
-	}
+	
 	
 }
 
